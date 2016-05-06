@@ -4,11 +4,7 @@ case class Left[+E](value: E) extends Either[E, Nothing]
 case class Right[+A](value: A) extends Either[Nothing, A]
 sealed trait Either[+E, +A] {
 
-  def map[B](f: A => B): Either[E, B] =
-    this match {
-      case Right(a) => Right(f(a))
-      case Left(e) => Left(e)
-    }
+  def map[B](f: A => B): Either[E, B] = flatMap {a => Right(f(a))}
 
   def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] =
     this match {
@@ -23,12 +19,6 @@ sealed trait Either[+E, +A] {
     }
 
   def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] =
-    this match {
-      case Right(a1) => b match {
-        case Right(a2) => Right(f(a1, a2))
-        case Left(e) => Left(e)
-      }
-      case Left(e) => Left(e)
-    }
+    flatMap {a1 => b map {a2 => f(a1, a2)} }
 
 }
