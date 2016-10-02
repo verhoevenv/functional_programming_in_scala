@@ -31,7 +31,14 @@ sealed trait Stream[+A] {
       case _ => z
     }
 
-  def forAll(p: A => Boolean): Boolean = foldRight(true)((elem, lazyRecursiveFoldValue) => p(elem) && lazyRecursiveFoldValue)
+  import chapter5.Stream._
+
+  def forAll(p: A => Boolean): Boolean =
+    foldRight(true)((elem, lazyRecursiveFoldValue) => p(elem) && lazyRecursiveFoldValue)
+
+  def takeWhile_fold(p: A => Boolean): Stream[A] =
+    foldRight(empty: Stream[A])((a, b) => if(p(a)) cons(a, b) else Empty)
+
 }
 
 case object Empty extends Stream[Nothing]
