@@ -6,6 +6,18 @@ sealed trait Stream[+A] {
       case Empty => List()
       case Cons(h, t) => h() :: t().toList
     }
+
+  def take(n: Int) : Stream[A] =
+    this match {
+      case Cons(h, t) => if(n == 0) Empty else Cons(h, () => t().take(n-1))
+      case _ => this
+    }
+
+  def drop(n: Int) : Stream[A] =
+    this match {
+      case Cons(h, t) => if(n == 0) this else t().drop(n-1)
+      case _ => this
+    }
 }
 
 case object Empty extends Stream[Nothing]
