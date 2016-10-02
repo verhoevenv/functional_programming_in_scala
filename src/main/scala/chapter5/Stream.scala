@@ -24,12 +24,14 @@ sealed trait Stream[+A] {
       case Cons(h, t) => if(!p(h())) Empty else Cons(h, () => t().takeWhile(p))
       case _ => this
     }
-  
+
   def foldRight[B](z: => B)(f: (A, => B) => B): B =
     this match {
       case Cons(h, t) => f(h(), t().foldRight(z)(f))
       case _ => z
     }
+
+  def forAll(p: A => Boolean): Boolean = foldRight(true)((elem, lazyRecursiveFoldValue) => p(elem) && lazyRecursiveFoldValue)
 }
 
 case object Empty extends Stream[Nothing]
