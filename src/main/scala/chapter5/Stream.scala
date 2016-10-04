@@ -90,4 +90,17 @@ object Stream {
       case Some((v, s)) => cons(v, unfold(s)(f))
       case None => empty
     }
+
+  def fibs_unfold: Stream[Int] = unfold((0, 1)) {
+    case (cur, next) => Some(cur, (next, cur + next))
+  }
+
+  def from_unfold(n: Int): Stream[Int] = unfold(n){x => Some(x, x + 1)}
+
+  import Function.const
+
+  def constant_unfold[A](a: A): Stream[A] = unfold(a)(const(Some(a, a)))
+
+  val ones_unfold: Stream[Int] = unfold(null)(const(Some(1, null)))
+
 }
