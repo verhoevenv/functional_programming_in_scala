@@ -7,6 +7,12 @@ sealed trait Stream[+A] {
       case Cons(h, t) => h() :: t().toList
     }
 
+  def toListDeep: List[Any] =
+    toList.map {
+      case z: Stream[_] => z.toListDeep
+      case x => x
+    }
+
   def take(n: Int) : Stream[A] =
     this match {
       case Cons(h, t) => if(n == 0) Empty else Cons(h, () => t().take(n-1))
@@ -89,6 +95,12 @@ sealed trait Stream[+A] {
     zipall(s) takeWhile {case (_, x2) => x2.isDefined} forAll { case (x1, x2) => x1 == x2 }
   }
 
+  def tails: Stream[Stream[A]] = {
+    unfold(this) {
+      case Cons(h, t) => Some(Cons(h, t), t())
+      case Empty => None
+    }
+  }
 }
 
 case object Empty extends Stream[Nothing]
