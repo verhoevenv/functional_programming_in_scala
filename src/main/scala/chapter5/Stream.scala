@@ -1,11 +1,26 @@
 package chapter5
 
+import scala.annotation.tailrec
+
 sealed trait Stream[+A] {
-  def toList: List[A] =
+  def toList = toListTR
+
+  def toListSimple: List[A] =
     this match {
       case Empty => List()
-      case Cons(h, t) => h() :: t().toList
+      case Cons(h, t) => h() :: t().toListSimple
     }
+
+  def toListTR: List[A] = {
+    @tailrec
+    def go(s: Stream[A], acc: List[A]): List[A] = {
+      s match {
+        case Empty => acc
+        case Cons(h, t) => go(t(), h() :: acc)
+      }
+    }
+    go(this, List())
+  }
 
   def toListDeep: List[Any] =
     toList.map {
