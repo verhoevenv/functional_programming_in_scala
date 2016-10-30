@@ -31,6 +31,12 @@ object RNG {
         }
       }
     }
+
+  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
+    rng => {
+      val (res, state) = f(rng)
+      g(res)(state)
+    }
 }
 
 trait RNG {
