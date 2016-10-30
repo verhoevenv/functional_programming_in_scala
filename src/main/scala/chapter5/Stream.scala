@@ -19,7 +19,7 @@ sealed trait Stream[+A] {
         case Cons(h, t) => go(t(), h() :: acc)
       }
     }
-    go(this, List())
+    go(this, List()).reverse
   }
 
   def toListDeep: List[Any] =
