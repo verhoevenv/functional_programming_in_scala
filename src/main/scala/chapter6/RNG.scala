@@ -19,6 +19,18 @@ object RNG {
     }
 
   def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] = map2(ra, rb)((_, _))
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+    rng => {
+      fs match {
+        case List() => (List(), rng)
+        case headStateTransition :: tailStateTransition => {
+          val (headResult, nextState) = headStateTransition(rng)
+          val (tailResult, finalState) = sequence(tailStateTransition)(nextState)
+          (headResult :: tailResult, finalState)
+        }
+      }
+    }
 }
 
 trait RNG {
