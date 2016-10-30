@@ -37,6 +37,13 @@ object RNG {
       val (res, state) = f(rng)
       g(res)(state)
     }
+
+  def mapFM[A,B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(res => unit(f(res)))
+
+  def map2FM[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A,B) => C): Rand[C] =
+    flatMap(both(ra, rb))(res => unit(f.tupled(res)))
+
 }
 
 trait RNG {
