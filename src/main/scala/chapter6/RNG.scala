@@ -17,6 +17,8 @@ object RNG {
       val (b, rng3) = rb(rng2)
       (f(a, b), rng3)
     }
+
+  def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] = map2(ra, rb)((_, _))
 }
 
 trait RNG {
