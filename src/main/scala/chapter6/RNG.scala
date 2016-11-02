@@ -21,16 +21,7 @@ object RNG {
   def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] = map2(ra, rb)((_, _))
 
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
-    rng => {
-      fs match {
-        case List() => (List(), rng)
-        case headStateTransition :: tailStateTransition => {
-          val (headResult, nextState) = headStateTransition(rng)
-          val (tailResult, finalState) = sequence(tailStateTransition)(nextState)
-          (headResult :: tailResult, finalState)
-        }
-      }
-    }
+    (fs foldRight (unit(List()): Rand[List[A]])) { (rand, y) => map2(rand, y)(_ :: _) }
 
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
     rng => {

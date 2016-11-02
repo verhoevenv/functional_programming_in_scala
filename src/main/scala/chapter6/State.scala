@@ -12,16 +12,8 @@ object State {
     })
 
   def sequence[S, A](fs: List[State[S, A]]): State[S, List[A]] =
-    State(s => {
-      fs match {
-        case List() => (List(), s)
-        case headStateTransition :: tailStateTransition => {
-          val (headResult, nextState) = headStateTransition(s)
-          val (tailResult, finalState) = sequence(tailStateTransition)(nextState)
-          (headResult :: tailResult, finalState)
-        }
-      }
-    })
+    (fs foldRight (unit(List()): State[S, List[A]])) { (rand, y) => map2(rand, y)(_ :: _) }
+
 }
 
 case class State[S, +A](run: S => (A, S)) {
